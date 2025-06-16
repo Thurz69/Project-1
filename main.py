@@ -15,7 +15,7 @@ def spin_row():
         print("**************")
         print(" | ".join(result))
         print("**************")
-        time.sleep(1)
+        time.sleep(0.5)
     return result
 
 def print_row(row):
@@ -23,15 +23,15 @@ def print_row(row):
 def get_payout(row, bet):
     if row[0] == row[1] == row[2]:
         if row[0] == '🍒':
-            return bet * 2
-        elif row[0] == '🍉':
-            return bet * 3
-        elif row[0] == '⭐':
-            return bet * 5
-        elif row[0] == '🍋':
-            return bet * 10
-        elif row[0] == '💰':
             return bet * 20
+        elif row[0] == '🍉':
+            return bet * 25
+        elif row[0] == '⭐':
+            return bet * 40
+        elif row[0] == '🍋':
+            return bet * 50
+        elif row[0] == '💰':
+            return bet * 100
     else:
         return 0
 
@@ -263,88 +263,99 @@ def main(user, acc_balance):
             else:
                 while balance > 0:
                     bet = input('Ingin taruhan berapa: ')
-                    if bet.isdigit():
+                    if not bet.isdigit():
+                        print('Masukan digit valid')
+                        continue
+                    elif bet.isdigit():
                         bet = int(bet)
-                        list_user = []
+                        if bet < 1000:
+                            print('Bet minimal adalah Rp.1000')
+                            break
+                        elif bet > balance:
+                            print('Saldo tidak mencukupi')
+                            break
+                        else:
+                            how_many_spin = input('Ingin melakukan berapa kali spin :')
+                            for spin in range(1, int(how_many_spin) + 1):
+                                if balance - bet < 0:
+                                    print('Saldo tidak mencukupi')
+                                    break
+                                else:
+                                    pass
+                                list_user = []
 
-                        with open(file_path, 'r', newline="") as file:
-                            reader = csv.reader(file)
-                            for item in reader:
-                                list_user.append(item)
+                                with open(file_path, 'r', newline="") as file:
+                                    reader = csv.reader(file)
+                                    for item in reader:
+                                        list_user.append(item)
 
-                        
-                        found = False
-                        for i, users in enumerate(list_user):
-                            if len(users) >= 3 and users[0] == username:
-                                balance_index = int(users[2])
-                                new_balance = balance_index - bet
-                                list_user[i][2] = str(new_balance)
-                                balance = new_balance
-                                found = True
-                                break
+                                    
+                                found = False
+                                for i, users in enumerate(list_user):
+                                    if len(users) >= 3 and users[0] == username:
+                                        balance_index = int(users[2])
+                                        new_balance = balance_index - bet
+                                        list_user[i][2] = str(new_balance)
+                                        balance = new_balance
+                                        found = True
+                                        break
 
-                        if found:
+                                if found:
+                                        
+                                    with open(file_path, 'w', newline="") as file:
+                                        writer = csv.writer(file)
+                                        writer.writerows(list_user)
+                                    print(f"Bet Berhasil!! Saldo baru: Rp.{balance}")
+                                else:
+                                    print("User tidak ditemukan.")
+                                
+                                row = list(spin_row())
+                                print_row(row)
+                                #get_payout(row, bet)
+                                jackpot = int(get_payout(row, bet))
+
+                                list_user = []
+
+                                with open(file_path, 'r', newline="") as file:
+                                    reader = csv.reader(file)
+                                    for item in reader:
+                                        list_user.append(item)
+
+                                    
+                                found = False
+                                for i, users in enumerate(list_user):
+                                    if len(users) >= 3 and users[0] == username:
+                                        balance_index = int(users[2])
+                                        new_balance = balance_index + jackpot
+                                        list_user[i][2] = str(new_balance)
+                                        balance = new_balance
+                                        found = True
+                                        break
+
+                                if found:
+                                        
+                                    with open(file_path, 'w', newline="") as file:
+                                        writer = csv.writer(file)
+                                        writer.writerows(list_user)
+                                else:
+                                    print("User tidak ditemukan.")
+                                    
+                                if jackpot > 0:
+                                    print('JAAACKKKPOOOTT!!!!')
+                                    print(f"Selamat kamu mendapatkan Rp{jackpot}")
+                                    
+                                else:
+                                    print('Maaf kamu belum beruntung')
                             
-                            with open(file_path, 'w', newline="") as file:
-                                writer = csv.writer(file)
-                                writer.writerows(list_user)
-                            print(f"Deposit berhasil! Saldo baru: Rp.{balance}")
-                        else:
-                            print("User tidak ditemukan.")
-                        row = list(spin_row())
-                        print_row(row)
-                        get_payout(row, bet)
-                        jackpot = int(get_payout(row, bet))
-
-                        list_user = []
-
-                        with open(file_path, 'r', newline="") as file:
-                            reader = csv.reader(file)
-                            for item in reader:
-                                list_user.append(item)
-
-                        
-                        found = False
-                        for i, users in enumerate(list_user):
-                            if len(users) >= 3 and users[0] == username:
-                                balance_index = int(users[2])
-                                new_balance = balance_index + jackpot
-                                list_user[i][2] = str(new_balance)
-                                balance = new_balance
-                                found = True
-                                break
-
-                        if found:
-                            
-                            with open(file_path, 'w', newline="") as file:
-                                writer = csv.writer(file)
-                                writer.writerows(list_user)
-                            print(f"Deposit berhasil! Saldo baru: Rp.{balance}")
-                        else:
-                            print("User tidak ditemukan.")
-                        
-                        if jackpot > 0:
-                            print(f"Selamat kamu mendapatkan Rp{jackpot}")
-                            balance += jackpot
-                        else:
-                            print('Maaf kamu belum beruntung')
-                        print(f"Balance saat ini Rp.{balance}")
-                        
-                    elif '-' in bet:
-                        print('Masa taruhannya negatif !!!')
-                        continue
-                    else:
-                        print('Masukan angka saja')
-                        continue
-                    
-                    next_no = input('Masih ingin main? (y/n) ')
-                    next = ['y']
-                    no = ['n']
-                    
-                    if next_no.lower() in next:
-                        continue
-                    elif next_no.lower() in no:
-                        break
+                                print(f"Balance saat ini Rp.{balance}")
+                                next_no = input('Masih ingin main? (y/n) ')
+                                next = ['y']
+                                no = ['n']
+                                
+                                if next_no.lower() in next:
+                                    continue
+                                elif next_no.lower() in no:
+                                    break
             
         elif pilihan == 3:
             print('Terima kasih sudah bermain')
