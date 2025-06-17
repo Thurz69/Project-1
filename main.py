@@ -216,7 +216,12 @@ def main(user, acc_balance):
         print('2) Taruhan')
         print('3) Exit')
         print('*'*30)
-        pilihan = int(input('Masukan pilihan mu: '))
+
+        try:
+            pilihan = int(input('Masukan pilihan mu: '))
+        except ValueError:
+            print('Masukan angka yang valid!')
+            continue
 
         if pilihan == 1:
             depo = input('Masukan nominal deposit: ')
@@ -347,22 +352,25 @@ def main(user, acc_balance):
                                 else:
                                     print('Maaf kamu belum beruntung')
                             
-                                print(f"Balance saat ini Rp.{balance}")
-                                next_no = input('Masih ingin main? (y/n) ')
-                                next = ['y']
-                                no = ['n']
+                            print(f"Balance saat ini Rp.{balance}")
+                            next_no = input('Masih ingin main? (y/n) ')
+                            next = ['y']
+                            no = ['n']
                                 
-                                if next_no.lower() in next:
-                                    continue
-                                elif next_no.lower() in no:
-                                    break
+                            if next_no.lower() in next:
+                                continue
+                            elif next_no.lower() in no:
+                                break
             
         elif pilihan == 3:
             print('Terima kasih sudah bermain')
             break
-        else:
-            print('Masukan angka 1 - 3 saja!!')
+        elif pilihan < 0:
+            print('Masukan angka valid!!')
             continue
+        else:
+            continue
+
 if __name__ == '__main__':
     welcomer()
     time.sleep(3)
